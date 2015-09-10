@@ -20,7 +20,11 @@ def builtins():
                 childscope = tt
 
             if childscope:
-                retval = [lmatch.value for lmatch in parse("$" + path).find(childscope)]
+                if path and not path[0] == ".":
+                    path = "$.%s" % path
+                else:
+                    path = "$%s" % path
+                retval = [lmatch.value for lmatch in parse(path).find(childscope)]
                 return retval if retval else []
             else:
                 return []
@@ -58,19 +62,19 @@ def builtins():
     def typeF(parentscope, scope, l, src, tt, b):
         item = scope.get("value")
         if isObject(item):
-            return "map"
+            return u"map"
         elif isArray(item):
-            return "list"
+            return u"list"
         elif isString(item):
-            return "string"
+            return u"string"
         elif isNumber(item):
-            return "number"
+            return u"number"
         elif isBool(item):
-            return "boolean"
+            return u"boolean"
         elif item is None:
-            return "null"
+            return u"null"
         else:
-            return "unknown"
+            return u"unknown"
         
     def makemapF(parentscope, scope, l, src, tt, b):
         retval = {}
