@@ -155,6 +155,39 @@ def _evaluate(s, t, l, src, tt, b):
         retval = t # simple transform
     return retval
 
+def _evaluate(s, t, l, src, tt, b):
+    if isEval(t):
+        retval = _evaluateEval(s, t, l, src, tt, b)
+    elif isBuiltinEval(t):
+        retval = _evaluateBuiltin(s, t, l, src, tt, b)
+    elif isQuoteEval(t):
+        retval = _quoteEvaluate(s, t.get("'"), l, src, tt, b)
+    elif isDictTransform(t):
+        retval = _evaluateDict(s, t, l, src, tt, b)
+    elif isListTransform(t):
+        if len(t) > 0 and t[0] == "&&":
+            retval = _flatten(_evaluateList(s, t[1:], l, src, tt, b))
+        else:
+            retval = _evaluateList(s, t, l, src, tt, b)
+    elif isPathTransform(t):
+        retval = _evaluatePath(s, t[2:], l, src, tt, b)
+    elif isPathHeadTransform(t):
+        retval = _evaluatePathHead(s, t[1:], l, src, tt, b)
+    else:
+        retval = t # simple transform
+    return retval
+
+def _quoteEvaluate(s, t, l, src, tt, b):
+    if isDoubleQuoteEval(t):
+        retval = _evaluate(s, t.get("''"), l, src, tt, b)
+    elif isDictTransform(t):
+        retval = _quoteEvaluateDict(s, t, l, src, tt, b)
+    elif isListTransform(t):
+        retval = _quoteEvaluateList(s, t, l, src, tt, b)
+    else:
+        retval = t # simple transform
+    return retval
+
 def _evaluateBuiltin(s, t, l, src, tt, b):
     retval = None
 
@@ -189,8 +222,18 @@ def _evaluateDict(s, t, l, src, tt, b):
     } 
     return retval
 
+def _quoteEvaluateDict(s, t, l, src, tt, b):
+    retval = {
+        key: _quoteEvaluate(s, t[key], l, src, tt, b) 
+            for key in t.keys()
+    } 
+    return retval
+
 def _evaluateList(s, t, l, src, tt, b):
     return [_evaluate(s, item, l, src, tt, b) for item in t]
+
+def _quoteEvaluateList(s, t, l, src, tt, b):
+    return [_quoteEvaluate(s, item, l, src, tt, b) for item in t]
 
 def _evaluatePathHead(s, t, l, src, tt, b):
     resultlist = _evaluatePath(s, t, l, src, tt, b)
@@ -217,6 +260,9 @@ def isEval(obj):
 
 def isQuoteEval(obj):
     return isObject(obj) and "'" in obj
+
+def isDoubleQuoteEval(obj):
+    return isObject(obj) and "''" in obj
 
 def isDictTransform(obj):
     return isObject(obj)
