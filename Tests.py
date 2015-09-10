@@ -64,7 +64,7 @@ class Tests(unittest.TestCase):
             "eventkeyid": "3a300a90-eca4-e101-383d-6bfd5990d791", 
             "key": "244de280-a01a-c5da-4162-ced9775246a5", 
             "clientkey": "82b25cfa-f0ec-4f44-9209-77cbd98edd6a", 
-            "docalt": None, 
+            "docalt": [1, 2, [3, 4]], 
             "invalid": False, 
             "document": {
                 "description": "stuff", 
@@ -110,21 +110,30 @@ class Tests(unittest.TestCase):
           "themeindex": 6,
           "eventkeyid": "3a300a90-eca4-e101-383d-6bfd5990d791",
           "published": True,
-          "type": "Metric_update",
-          "name": "thingo",
           "__meta__": {
+            "docalt": [
+              1,
+              2,
+              [
+                3,
+                4
+              ]
+            ],
             "updated": 1438517599342400,
             "apkey": "2a02d608-6431-40aa-b0b2-91bf5f48cd84",
+            "invalid": False,
             "stored": 1438313529667260,
             "eventkeyid": "3a300a90-eca4-e101-383d-6bfd5990d791",
             "key": "244de280-a01a-c5da-4162-ced9775246a5",
             "clientkey": "82b25cfa-f0ec-4f44-9209-77cbd98edd6a",
-            "docalt": None,
-            "invalid": False,
             "type": "CachedObject",
-            "indexnames": "82B25CFA-F0EC-4F44-9209-77CBD98EDD6A-Metric",
+            "indexnames": [
+              "82B25CFA-F0EC-4F44-9209-77CBD98EDD6A-Metric"
+            ],
             "objecttype": "Metric"
-          }
+          },
+          "type": "Metric_update",
+          "name": "thingo"
         }
           
         lresult = EvaluateTransform(
