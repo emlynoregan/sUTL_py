@@ -449,9 +449,6 @@ class Tests(unittest.TestCase):
               "false": { "'": False }
             },
             "requires": [
-              "testcond", 
-              "head_core_emlynoregan_com", 
-              "tail_core_emlynoregan_com"
             ]
           }
         
@@ -587,6 +584,22 @@ class Tests(unittest.TestCase):
         
         lexpected = False
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
+
+    def test_15(self):
+        ljsonDecls = GetDeclarations()
+
+        ldecl = {
+            "transform-t": "#$", 
+            "language": "sUTL0"
+        }
+
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                self._source
+            )
+        
+        self.assertTrue(self.deepEqual(lresult, self._source), "lresult: %s" % json.dumps(lresult))
 
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)

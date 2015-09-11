@@ -1,4 +1,4 @@
-from jsonpath_rw import parse
+from jsonpath import jsonpath
 
 def builtins():
     def pathF(parentscope, scope, l, src, tt, b):
@@ -24,8 +24,14 @@ def builtins():
                     path = "$.%s" % path
                 else:
                     path = "$%s" % path
-                retval = [lmatch.value for lmatch in parse(path).find(childscope)]
-                return retval if retval else []
+
+                if path == "$":
+                    retval = [childscope]
+                else:
+                    retval = jsonpath(childscope, path, use_eval=False)
+                return retval
+#                retval = [lmatch.value for lmatch in parse(path).find(childscope)]
+#                 return retval if retval else []
             else:
                 return []
     
