@@ -150,6 +150,8 @@ def _evaluate(s, t, l, src, tt, b):
         retval = _evaluateBuiltin(s, t, l, src, tt, b)
     elif isQuoteEval(t):
         retval = _quoteEvaluate(s, t.get("'"), l, src, tt, b)
+    elif isColonEval(t):
+        retval = t.get(":")
     elif isDictTransform(t):
         retval = _evaluateDict(s, t, l, src, tt, b)
     elif isListTransform(t):
@@ -251,6 +253,9 @@ def isQuoteEval(obj):
 
 def isDoubleQuoteEval(obj):
     return isObject(obj) and "''" in obj
+
+def isColonEval(obj):
+    return isObject(obj) and ":" in obj
 
 def isDictTransform(obj):
     return isObject(obj)
