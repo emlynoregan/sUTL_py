@@ -290,7 +290,6 @@ def compilelib(decls, dists, test):
 def _compilelib(decls, dists, l, test, b):
     resultlib = {}
     resultlib.update(l) # start as a copy of the existing library
-    resultliblib = {};
 
     # need to add recursive requirements into resultlib
 
@@ -341,8 +340,6 @@ def _compilelib(decls, dists, l, test, b):
 
                     for libkey in clresult["lib"]:
                         resultlib[libkey] = clresult["lib"][libkey]
-
-                    resultliblib[reqname] = clresult["lib"]
 
                     resultlib[reqname] = candidate_decl.get("transform-t")
 
