@@ -1,8 +1,6 @@
 import unittest
 import sUTL
 import json
-import io
-import os
 import urllib2
 
 class Tests(unittest.TestCase):
@@ -600,6 +598,25 @@ class Tests(unittest.TestCase):
             )
         
         self.assertTrue(self.deepEqual(lresult, self._source), "lresult: %s" % json.dumps(lresult))
+
+    def test_16(self):
+        ljsonDecls = GetDeclarations()
+
+        ldecl = {
+            "transform-t": {
+                "&": "len",
+                "list": [1, 2]
+            },
+            "language": "sUTL0"
+        }
+
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                self._source
+            )
+        
+        self.assertEqual(2, lresult)
 
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)

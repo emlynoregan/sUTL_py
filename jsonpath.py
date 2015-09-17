@@ -158,7 +158,7 @@ def jsonpath(obj, expr, result_type='VALUE', debug=0, use_eval=True):
                 trace(x, obj[loc], s(path, loc))
             elif isinstance(obj, list) and isint(loc):
                 iloc = int(loc)
-                if len(obj) >= iloc:
+                if len(obj) > iloc: # EJO: Fixed an error here (was >=)
                     trace(x, obj[iloc], s(path, loc))
             else:
                 # [(index_expression)]
@@ -307,7 +307,7 @@ def jsonpath(obj, expr, result_type='VALUE', debug=0, use_eval=True):
 
         if len(result) > 0:
             return result
-    return []
+    return [] # EJO: Changed from returning None
 
 if __name__ == '__main__':
     try:

@@ -51,6 +51,13 @@ def builtins():
 
         return retval
     
+    def lenF(parentscope, scope, l, src, tt, b):
+        obj = scope.get("list")
+        if isArray(obj):
+            return len(obj)
+        else:
+            return 0
+
     def keysF(parentscope, scope, l, src, tt, b):
         obj = scope.get("map")
         if isObject(obj):
@@ -128,6 +135,7 @@ def builtins():
         "||": getBinOpF(lambda scope: scope.get("a", False), lambda scope: scope.get("b", False), lambda i, j: i or j),
         "!": getUnOpF(lambda scope: scope.get("a", False), lambda i: not i),
         "if": ifF,
+        "len": lenF,
         "keys": keysF,
         "values": valuesF,
         "type": typeF,
