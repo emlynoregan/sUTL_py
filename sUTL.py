@@ -1,39 +1,90 @@
 from jsonpath import jsonpath
+from dns.rdatatype import NULL
+
+def _processPath(startfrom, parentscope, scope, l, src, tt, b):
+    la = scope.get("a")
+    lb = scope.get("b")
+    lnotfirst = scope.get("notfirst")
+    
+    if lnotfirst:
+        return _doPath(la, lb)
+    else:
+        laccum = _doPath([startfrom], la)
+        return _doPath(laccum, lb)
+    
+def _doPath(a, b):
+    retval = []
+    
+    if isArray(a):
+        if not b is None and b != "":
+            for litem in a:
+                try:
+                    if b == "**":
+                        retval.append(litem)
+                        lstack = [litem]
+                        while lstack:
+                            lstackItem = lstack.pop()
+                            if isObject(lstackItem):
+                                retval.extend(lstackItem.values())
+                                lstack.extend(lstackItem.values())
+                            elif isArray(litem):
+                                retval.extend(lstackItem)
+                                lstack.extend(lstackItem)
+                    elif b == "*":
+                        if isObject(litem):
+                            retval.extend(litem.values())
+                        elif isArray(litem):
+                            retval.extend(litem)
+                    elif isObject(litem) and isString(b):
+                        if b in litem:
+                            retval.append(litem.get(b))
+                    elif isArray(litem) and isNumber(b):
+                        if b >= 0 and b < len(litem):
+                            retval.append(litem[b])
+                except:
+                    pass # something bad happened, dump this one
+        else:
+            retval = a
+    # else wtf? Just do nothing
+    
+    return retval
 
 def builtins():
+    
     def pathF(parentscope, scope, l, src, tt, b):
-            fullpath = scope.get("path", "")
+        '''
+        DEPRECATED
+        '''
+        fullpath = scope.get("path", "")
 
-            prefix = fullpath[:1]
-            path = fullpath[1:]
-            childscope = None
+        prefix = fullpath[:1]
+        path = fullpath[1:]
+        childscope = None
 
-            if prefix == '@':
-                childscope = parentscope
-            elif prefix == '^':
-                childscope = scope # is this even a thing?
-            elif prefix == '*':
-                childscope = l
-            elif prefix == '$':
-                childscope = src
-            elif prefix == '~':
-                childscope = tt
+        if prefix == '@':
+            childscope = parentscope
+        elif prefix == '^':
+            childscope = scope # is this even a thing?
+        elif prefix == '*':
+            childscope = l
+        elif prefix == '$':
+            childscope = src
+        elif prefix == '~':
+            childscope = tt
 
-            if childscope:
-                if path and not path[0] == ".":
-                    path = "$.%s" % path
-                else:
-                    path = "$%s" % path
-
-                if path == "$":
-                    retval = [childscope]
-                else:
-                    retval = jsonpath(childscope, path, use_eval=False)
-                return retval
-#                retval = [lmatch.value for lmatch in parse(path).find(childscope)]
-#                 return retval if retval else []
+        if childscope:
+            if path and not path[0] == ".":
+                path = "$.%s" % path
             else:
-                return []
+                path = "$%s" % path
+
+            if path == "$":
+                retval = [childscope]
+            else:
+                retval = jsonpath(childscope, path, use_eval=False)
+            return retval
+        else:
+            return []
     
     def ifF(parentscope, scope, l, src, tt, b):
         retval = None
@@ -96,6 +147,66 @@ def builtins():
             retval = { entry[0]: entry[1] for entry in item if isArray(entry) and len(entry) >= 2 and isString(entry[0]) } 
             return retval
         
+    def andF(parentscope, scope, l, src, tt, b):
+        a = scope.get("a")
+        b = scope.get("b")
+        
+        if "a" in scope:
+            if "b" in scope:
+                return a and b
+            else:
+                return a
+        else:
+            return b
+
+    def reduceF(parentscope, scope, l, src, tt, b):
+        llist = scope.get("list")
+        t = scope.get("t")
+        accum = scope.get("accum")
+        
+        if isArray(llist):
+            for ix, item in enumerate(llist):
+                s2 = dict(parentscope)
+                s2.update(scope)
+                s2["item"] = item
+                s2["accum"] = accum
+                s2["ix"] = ix
+                
+                accum = _evaluate(s2, t, l, src, tt, b)
+                
+        return accum
+
+    def rawPathingF(parentscope, scope, l, src, tt, b):
+        a = scope.get("a")
+        b = scope.get("b")
+        notfirst = scope.get("notfirst")
+        
+        if notfirst:
+            return _doPath(a, b)
+        else:
+            if a is None:
+                return _doPath([b], None)
+            else:
+                return _doPath([a], b)
+        
+    def headF(parentscope, scope, l, src, tt, b):
+        b = scope.get("b")
+
+        if isArray(b):
+            if len(b):
+                return b[0]
+            else:
+                return None
+            
+    def tailF(parentscope, scope, l, src, tt, b):
+        b = scope.get("b")
+
+        if isArray(b):
+            if len(b):
+                return b[1:]
+            else:
+                return []
+            
     def getBinOpF(iF, jF, aDoOpF):
         def OpF(parentscope, scope, l, src, tt, b):
             try:
@@ -118,7 +229,7 @@ def builtins():
                 retval = None
             return retval
         return OpF
-
+        
     retval = {
         "path": pathF,
         "+": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i + j),
@@ -131,15 +242,24 @@ def builtins():
         "<=": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i <= j),
         ">": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i > j),
         "<": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i < j),
-        "&&": getBinOpF(lambda scope: scope.get("a", True), lambda scope: scope.get("b", True), lambda i, j: i and j),
+        "&&": andF,
         "||": getBinOpF(lambda scope: scope.get("a", False), lambda scope: scope.get("b", False), lambda i, j: i or j),
-        "!": getUnOpF(lambda scope: scope.get("a", False), lambda i: not i),
+        "!": getUnOpF(lambda scope: scope.get("b", False), lambda i: not i),
         "if": ifF,
         "len": lenF,
         "keys": keysF,
         "values": valuesF,
         "type": typeF,
-        "makemap": makemapF
+        "makemap": makemapF,
+        "reduce": reduceF,
+        "head": headF,
+        "tail": tailF,
+        "$": lambda parentscope, scope, l, src, tt, b: _processPath(src, parentscope, scope, l, src, tt, b),
+        "@": lambda parentscope, scope, l, src, tt, b: _processPath(parentscope, parentscope, scope, l, src, tt, b),
+        "^": lambda parentscope, scope, l, src, tt, b: _processPath(scope, parentscope, scope, l, src, tt, b),
+        "*": lambda parentscope, scope, l, src, tt, b: _processPath(l, parentscope, scope, l, src, tt, b),
+        "~": lambda parentscope, scope, l, src, tt, b: _processPath(tt, parentscope, scope, l, src, tt, b),
+        "%": rawPathingF
     }
     
     retval.update(
@@ -162,11 +282,15 @@ def _evaluate(s, t, l, src, tt, b):
         retval = t.get(":")
     elif isDictTransform(t):
         retval = _evaluateDict(s, t, l, src, tt, b)
+    elif isArrayBuiltinEval(t, b):
+        retval = _evaluateArrayBuiltin(s, t, l, src, tt, b)
     elif isListTransform(t):
         if len(t) > 0 and t[0] == "&&":
             retval = _flatten(_evaluateList(s, t[1:], l, src, tt, b))
         else:
             retval = _evaluateList(s, t, l, src, tt, b)
+    elif isStringBuiltinEval(t, b):
+        retval = _evaluateStringBuiltin(s, t, l, src, tt, b)
     elif isPathTransform(t):
         retval = _evaluatePath(s, t[2:], l, src, tt, b)
     elif isPathHeadTransform(t):
@@ -186,20 +310,86 @@ def _quoteEvaluate(s, t, l, src, tt, b):
         retval = t # simple transform
     return retval
 
+def _getArrayBuiltinName(aOp):
+    if len(aOp):
+        return aOp[1:]
+    else:
+        return None
+
+def _evaluateStringBuiltin(s, t, l, src, tt, b):
+    arr = t.split(".")
+    
+    arr2 = []
+    
+    for item in arr:
+        itemParsed = item
+        try:
+            itemParsed = int(item)
+        except ValueError, _:
+            pass # expected, just means it's a string
+        arr2.append(itemParsed)
+
+    return _evaluateArrayBuiltin(s, arr2, l, src, tt, b)
+    
+def _evaluateArrayBuiltin(s, t, l, src, tt, b):
+    op = t[0]
+    
+    opChar = op[0]
+    
+    uset = {
+      "&": _getArrayBuiltinName(op),
+      "args": t[1:], #_evaluateList(s, t[1:], l, src, tt, b),
+      "head": opChar == "^"
+    }
+    
+    return _evaluateBuiltin(s, uset, l, src, tt, b)
+    
 def _evaluateBuiltin(s, t, l, src, tt, b):
     retval = None
 
-    builtinf = b.get(t.get("&"))
-
-    if builtinf:
-        s2 = _evaluateDict(s, t, l, src, tt, b)
-
-        l2 = _evaluateDict(s, t["*"], l, src, tt, b) if "*" in t else l
-
-#         try:
-        retval = builtinf(s, s2, l2, src, tt, b)
-#         except Exception, ex:
-#             retval = None # if the builtin fails, we just return None
+    largs = t.get("args")
+    if isArray(largs):
+        if len(largs) == 0:
+            uset = {
+                "&": t.get("&")
+            }
+            
+            retval = _evaluateBuiltin(s, uset, l, src, tt, b)
+        elif len(largs) == 1:
+            uset = {
+                "&": t.get("&"),
+                "b": _evaluate(s, largs[0], l, src, tt, b)
+            }
+            
+            retval = _evaluateBuiltin(s, uset, l, src, tt, b)
+        else:
+            #2 or more items in the args list. Reduce over them
+            llist = largs[1:]
+            retval = _evaluate(s, largs[0], l, src, tt, b)
+            for ix, item in enumerate(llist):
+                uset = {
+                    "&": t.get("&"),
+                    "a": retval,
+                    "b": _evaluate(s, item, l, src, tt, b),
+                    "notfirst": ix > 0
+                }
+                
+                retval = _evaluateBuiltin(s, uset, l, src, tt, b)
+                
+        if isArray(retval) and t.get("head"):
+            if retval:
+                retval = retval[0]
+            else:
+                retval = None
+    else:
+        builtinf = b.get(t.get("&"))
+    
+        if builtinf:
+            s2 = _evaluateDict(s, t, l, src, tt, b)
+    
+            l2 = _evaluateDict(s, t["*"], l, src, tt, b) if "*" in t else l
+    
+            retval = builtinf(s, s2, l2, src, tt, b)
 
     return retval
 
@@ -249,6 +439,25 @@ def _evaluatePath(s, t, l, src, tt, b):
 def _flatten(lst):
     lst2 = [item if isArray(item) else [item] for item in lst]
     return [item for sublist in lst2 for item in sublist]
+
+def isArrayBuiltinEval(arr, b):
+    retval = arr and isArray(arr) 
+    
+    if retval:
+        op = arr[0]
+            
+        retval = op and isString(op) and (op[0] in ["&", "^"]) and _getArrayBuiltinName(op) in b
+        
+    return retval
+
+def isStringBuiltinEval(astr, b):
+    retval = False
+    
+    if isString(astr):
+        arr = astr.split(".")
+        retval = isArrayBuiltinEval(arr, b)
+    
+    return retval
 
 def isBuiltinEval(obj):
     return isObject(obj) and "&" in obj

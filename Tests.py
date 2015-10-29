@@ -88,17 +88,17 @@ class Tests(unittest.TestCase):
                 "removekeys_core"
             ], 
             "transform-t": {
-                "!": "#*.addmaps_core", 
+                "!": "^*.addmaps_core", 
                 "map2": {
                     "__meta__": {
-                        "!": "#*.removekeys_core", 
-                        "map": "#$", 
+                        "!": "^*.removekeys_core", 
+                        "map": "^$", 
                         "keys": [
                             "document"
                         ]
                     }
                 }, 
-                "map1": "#$.document"
+                "map1": "^$.document"
             }, 
             "language": "sUTL0"
         }
@@ -146,7 +146,7 @@ class Tests(unittest.TestCase):
         ljsonDecls = GetDeclarations()
 
         ldecl = {
-            "transform-t": "#$.indexnames[1]", 
+            "transform-t": "^$.indexnames.1", 
             "language": "sUTL0"
         }
 
@@ -168,7 +168,7 @@ class Tests(unittest.TestCase):
                 "removekeys_core"
             ], 
             "transform-t": {
-                        "!": "#*.removekeys_core", 
+                        "!": "^*.removekeys_core", 
                         "map": "#$", 
                         "keys": [
                             "document",
@@ -207,8 +207,8 @@ class Tests(unittest.TestCase):
                 "isinlist_core"
             ], 
             "transform-t": {
-                        "!": "#*.isinlist_core", 
-                        "list": {"&": "keys", "map": "#$"}, 
+                        "!": "^*.isinlist_core", 
+                        "list": {"&": "keys", "map": "^$"}, 
                         "item": 
                             "document"
                         
@@ -233,8 +233,8 @@ class Tests(unittest.TestCase):
                 "filter_core"
             ], 
             "transform-t": {
-                        "!": "#*.filter_core", 
-                        "list": {"&": "keys", "map": "#$"}, 
+                        "!": "^*.filter_core", 
+                        "list": {"&": "keys", "map": "^$"}, 
                         "filter-t": True
                     },
             "language": "sUTL0"
@@ -253,18 +253,15 @@ class Tests(unittest.TestCase):
         ljsonDecls = GetDeclarations()
  
         ldecl = {
-            "requires": [
-                "reduce_core"
-            ], 
             "transform-t": {
-                "!": "#*.reduce_core", 
-                "list": {"&": "keys", "map": "#$"}, 
+                "&": "reduce", 
+                "list": {"&": "keys", "map": "^$"}, 
                 "accum": "",
                 "t": {"'": 
                   {
                     "&": "+",
-                    "a": "#@.item",
-                    "b": "#@.accum"
+                    "a": "^@.item",
+                    "b": "^@.accum"
                   }
                 }
             }, 
@@ -289,23 +286,22 @@ class Tests(unittest.TestCase):
             "language": "sUTL0",
             "transform-t": 
             {
-              "!": "#*.reduce_core_emlynoregan_com",
-              "list": "#@.list",
+              "&": "reduce",
+              "list": "^@.list",
               "accum": [],
               "t": {"'": [
                 "&&",
-                "#@.accum",
+                "^@.accum",
                 {
                   "&": "if",
                   "cond": {"'": 
-                    {"''": "#@.filter-t"}
+                    {"''": "^@.filter-t"}
                   },
-                  "true": ["#@.item"],
+                  "true": ["^@.item"],
                   "false": []
                 }
               ]}
-            },
-            "requires": ["reduce_core_emlynoregan_com"]
+            }
           }
         
         ljsonDecls.append([lfilterDecl])
@@ -316,14 +312,14 @@ class Tests(unittest.TestCase):
                 "testfilter"
             ], 
             "transform-t": {
-                        "!": "#*.testfilter", 
-                        "list": {"&": "keys", "map": "#$"}, 
-                        "filter-t": {"'": {
-                            "&": "=",
-                            "a": "#@.item",
-                            "b": "stored"
-                        }}
-                    },
+                "!": "^*.testfilter", 
+                "list": {"&": "keys", "map": "^$"}, 
+                "filter-t": {"'": {
+                    "&": "=",
+                    "a": "^@.item",
+                    "b": "stored"
+                }}
+            },
             "language": "sUTL0"
         }
         
@@ -371,25 +367,25 @@ class Tests(unittest.TestCase):
             "transform-t": 
             {
               "&": "if",
-              "cond": "#@.list",
+              "cond": "^@.list",
               "true": { "'": {
-                "!": "#*.testreduce",
+                "!": "^*.testreduce",
                 "list": {
-                  "!": "#*.tail_core_emlynoregan_com",
-                  "list": "#@.list"
+                  "!": "^*.tail_core_emlynoregan_com",
+                  "list": "^@.list"
                 },
-                "t": "#@.t",
+                "t": "^@.t",
                 "accum": {
-                  "!": "#@.t",
+                  "!": "^@.t",
                   "item": {
-                    "!": "#*.head_core_emlynoregan_com",
-                    "list": "#@.list"
+                    "!": "^*.head_core_emlynoregan_com",
+                    "list": "^@.list"
                   },
-                  "accum": "#@.accum"
+                  "accum": "^@.accum"
                 }
               }},
               "false": {
-                "'": "#@.accum"
+                "'": "^@.accum"
               }
             },
             "requires": [
@@ -407,16 +403,10 @@ class Tests(unittest.TestCase):
                 "testreduce"
             ], 
             "transform-t": {
-                "!": "#*.testreduce", 
-                "list": {"&": "keys", "map": "#$"}, 
+                "!": "^*.testreduce", 
+                "list": {"&": "keys", "map": "^$"}, 
                 "accum": "",
-                "t": {"'": 
-                  {
-                    "&": "+",
-                    "a": "#@.item",
-                    "b": "#@.accum"
-                  }
-                }
+                "t": {"'": [ "&+", "^@.item", "^@.accum"]}
             }, 
             "language": "sUTL0"
         }
@@ -442,7 +432,7 @@ class Tests(unittest.TestCase):
             "transform-t": 
             {
               "&": "if",
-              "cond": "#@.list",
+              "cond": "^@.list",
               "true": { "'": True },
               "false": { "'": False }
             },
@@ -458,8 +448,8 @@ class Tests(unittest.TestCase):
                 "testcond"
             ], 
             "transform-t": {
-                "!": "#*.testcond", 
-                "list": {"&": "keys", "map": "#$"}
+                "!": "^*.testcond", 
+                "list": {"&": "keys", "map": "^$"}
             }, 
             "language": "sUTL0"
         }
@@ -480,7 +470,7 @@ class Tests(unittest.TestCase):
         ljsonDecls = GetDeclarations()
 
         ldecl = {
-            "transform-t": {"&": "keys", "map": "#$"}, 
+            "transform-t": {"&": "keys", "map": "^$"}, 
             "language": "sUTL0"
         }
 
@@ -513,8 +503,8 @@ class Tests(unittest.TestCase):
 
         ldecl = {
           "transform-t": {"'": {
-            "a": "#$.updated", 
-            "b": {"''": "#$.updated"}
+            "a": "^$.updated", 
+            "b": {"''": "^$.updated"}
           }}, 
           "language": "sUTL0"
         }
@@ -526,7 +516,7 @@ class Tests(unittest.TestCase):
             )
         
         lexpected = {
-          "a": "#$.updated",
+          "a": "^$.updated",
           "b": 1438517599342400
         }
 
@@ -540,7 +530,7 @@ class Tests(unittest.TestCase):
                 "zip_core"
             ], 
             "transform-t": {
-                "!": "#*.zip_core", 
+                "!": "^*.zip_core", 
                 "list": [[1, 2], [3, 4]]
             }, 
             "language": "sUTL0"
@@ -567,7 +557,7 @@ class Tests(unittest.TestCase):
               "&": "<",
               "a": 0,
               "b": {
-                "!": "#*.count_core",
+                "!": "^*.count_core",
                 "obj": [[],[]]
               }
             }, 
@@ -587,7 +577,7 @@ class Tests(unittest.TestCase):
         ljsonDecls = GetDeclarations()
 
         ldecl = {
-            "transform-t": "#$", 
+            "transform-t": "^$", 
             "language": "sUTL0"
         }
 
@@ -617,6 +607,40 @@ class Tests(unittest.TestCase):
             )
         
         self.assertEqual(2, lresult)
+
+    def test_17(self):
+        ljsonDecls = GetDeclarations()
+
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": {
+            "!": "#*.foldone",
+            "lists": [[1], [2]],
+            "list": [3, 4]
+          },
+          "requires": [
+            "foldone"
+          ]
+        }
+
+        lexpected = [
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            4
+          ]
+        ]
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                self._source
+            )
+        
+        self.assertEqual(lexpected, lresult)
 
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)
@@ -650,6 +674,7 @@ def AddTests():
         def GetTestFunction():
             ldecl = lsUTLdeclaration
             def TheTestFunction(self):
+                print json.dumps(ldecl)
                 lresult = EvaluateTransform(ldecl, ljsonDecls)
  
                 if lresult:
