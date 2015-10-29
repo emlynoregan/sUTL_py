@@ -641,7 +641,7 @@ class Tests(unittest.TestCase):
             )
         
         self.assertEqual(lexpected, lresult)
-
+        
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)
     
@@ -660,14 +660,18 @@ def GetDeclarations():
     ljsonCoreString = urllib2.urlopen("http://emlynoregan.github.io/sUTL-spec/sUTL_core.json").read()
     ljsonDecls.append(json.loads(ljsonCoreString))
     return ljsonDecls
-        
-def AddTests():
-    ljsonDecls = GetDeclarations()
-     
+
+def GetCoreTests():
     ljsonCoreTestsString = urllib2.urlopen("http://emlynoregan.github.io/sUTL-spec/sUTL_coretests.json").read()
      
-    ljsonCoreTests = json.loads(ljsonCoreTestsString)
+    return json.loads(ljsonCoreTestsString)
+    
+        
+def AddTests(aGetDeclarationsF = GetDeclarations, aGetCoreTestsF = GetCoreTests):
+    ljsonDecls = aGetDeclarationsF()
      
+    ljsonCoreTests = aGetCoreTestsF()
+         
     for lindex, lsUTLdeclaration in enumerate(ljsonCoreTests):
         ltestName = lsUTLdeclaration.get("name", str(lindex))
          
@@ -686,4 +690,3 @@ def AddTests():
         ltestFunction.__name__ = str("test_%s" % ltestName)
         setattr(Tests, "test_%s" % ltestName, ltestFunction )
  
-AddTests()        

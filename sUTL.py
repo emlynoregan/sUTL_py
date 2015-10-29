@@ -1,5 +1,4 @@
 from jsonpath import jsonpath
-from dns.rdatatype import NULL
 
 def _processPath(startfrom, parentscope, scope, l, src, tt, b):
     la = scope.get("a")
