@@ -394,8 +394,9 @@ def _evaluateBuiltin(s, t, l, src, tt, b):
 
 def _evaluateEval(s, t, l, src, tt, b):
     t2 = _evaluate(s, t.get("!"), l, src, tt, b)
-
-    s2 = _evaluateDict(s, t, l, src, tt, b)
+    
+    s2 = dict(s) if isObject(s) else {}
+    s2.update(_evaluateDict(s, t, l, src, tt, b))
 
     l2 = _evaluateDict(s, t["*"], l, src, tt, b) if "*" in t else l
 

@@ -37,7 +37,7 @@ class Tests(unittest.TestCase):
             "language": "sUTL0",
             "transform-t":   
             {
-              "!": "#*.tests_tst",
+              "!": "^*.tests_tst",
               "tests": {"'": [
                 {
                   "name": "this one fails",
@@ -169,7 +169,7 @@ class Tests(unittest.TestCase):
             ], 
             "transform-t": {
                         "!": "^*.removekeys_core", 
-                        "map": "#$", 
+                        "map": "^$", 
                         "keys": [
                             "document",
                             "updated",
@@ -614,7 +614,7 @@ class Tests(unittest.TestCase):
         ldecl = {
           "language": "sUTL0",
           "transform-t": {
-            "!": "#*.foldone",
+            "!": "^*.foldone",
             "lists": [[1], [2]],
             "list": [3, 4]
           },
@@ -642,6 +642,42 @@ class Tests(unittest.TestCase):
         
         self.assertEqual(lexpected, lresult)
         
+    def test_18(self):
+        ljsonDecls = GetDeclarations()
+
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": {
+            "!": "^*.quicksort",
+            "list": [8, 1, 5, 3, 8, 9, 4, 3, 6, 2, 1],
+          },
+          "requires": [
+            "quicksort"
+          ]
+        }
+
+        lexpected = [
+          1,
+          1,
+          2,
+          3,
+          3,
+          4,
+          5,
+          6,
+          8,
+          8,
+          9
+        ]
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                self._source
+            )
+        
+        self.assertEqual(lexpected, lresult)
+
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)
     
