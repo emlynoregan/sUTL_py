@@ -28,6 +28,19 @@ class Tests(unittest.TestCase):
                     retval = aMAS1 == aMAS2
             
         return retval
+
+    def deepUnicode(self, aMAS1, maxdepth=100):
+        retval = aMAS1
+
+        if maxdepth:
+            if isinstance(aMAS1, dict):
+                retval = {unicode(lkey): self.deepUnicode(lvalue) for lkey, lvalue in aMAS1.iteritems()}
+            elif isinstance(aMAS1, list):
+                retval = [self.deepUnicode(lvalue) for lvalue in aMAS1]
+            elif isinstance(aMAS1, str):
+                retval = unicode(aMAS1)
+            
+        return retval
     
     def test_Fail(self):
         ljsonDecls = GetDeclarations()
@@ -103,10 +116,10 @@ class Tests(unittest.TestCase):
             "language": "sUTL0"
         }
           
-        lexpected = {
-          "description": "stuff",
+        lexpected = self.deepUnicode({
+          "description": u"stuff",
           "themeindex": 6,
-          "eventkeyid": "3a300a90-eca4-e101-383d-6bfd5990d791",
+          "eventkeyid": u"3a300a90-eca4-e101-383d-6bfd5990d791",
           "published": True,
           "__meta__": {
             "docalt": [
@@ -132,7 +145,7 @@ class Tests(unittest.TestCase):
           },
           "type": "Metric_update",
           "name": "thingo"
-        }
+        })
           
         lresult = EvaluateTransform(
                 ldecl,
@@ -186,9 +199,9 @@ class Tests(unittest.TestCase):
           
         lexpected = {
             "stored": 1438313529667260, 
-            "eventkeyid": "3a300a90-eca4-e101-383d-6bfd5990d791", 
-            "type": "CachedObject", 
-            "objecttype": "Metric"
+            "eventkeyid": u"3a300a90-eca4-e101-383d-6bfd5990d791", 
+            "type": u"CachedObject", 
+            "objecttype": u"Metric"
         }
          
         lresult = EvaluateTransform(
@@ -221,6 +234,7 @@ class Tests(unittest.TestCase):
                 ljsonDecls,
                 self._source
             )
+        
         
         if not lresult:
             raise Exception("Failed: %s" % lresult)
@@ -274,7 +288,7 @@ class Tests(unittest.TestCase):
                 self._source
             )
         
-        lexpected = "objecttypeindexnamestypedocumentinvaliddocaltclientkeykeyeventkeyidstoredapkeyupdated"
+        lexpected = u"objecttypeindexnamestypedocumentinvaliddocaltclientkeykeyeventkeyidstoredapkeyupdated"
         
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
@@ -330,7 +344,7 @@ class Tests(unittest.TestCase):
             )
         
         lexpected = [
-          "stored"
+          u"stored"
         ]
         
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
@@ -419,7 +433,7 @@ class Tests(unittest.TestCase):
                 self._source
             )
         
-        lexpected = "objecttypeindexnamestypedocumentinvaliddocaltclientkeykeyeventkeyidstoredapkeyupdated"
+        lexpected = u"objecttypeindexnamestypedocumentinvaliddocaltclientkeykeyeventkeyidstoredapkeyupdated"
         
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
         
@@ -481,18 +495,18 @@ class Tests(unittest.TestCase):
             )
         
         lexpected = [
-          "updated",
-          "apkey",
-          "stored",
-          "eventkeyid",
-          "key",
-          "clientkey",
-          "docalt",
-          "invalid",
-          "document",
-          "type",
-          "indexnames",
-          "objecttype"
+          u"updated",
+          u"apkey",
+          u"stored",
+          u"eventkeyid",
+          u"key",
+          u"clientkey",
+          u"docalt",
+          u"invalid",
+          u"document",
+          u"type",
+          u"indexnames",
+          u"objecttype"
         ]
 
         
@@ -674,6 +688,123 @@ class Tests(unittest.TestCase):
                 ldecl,
                 ljsonDecls,
                 self._source
+            )
+        
+        self.assertEqual(lexpected, lresult)
+
+    def test_19(self):
+        ljsonDecls = GetDeclarations()
+
+        lsource = {
+            "x": [
+                {
+                    "y": "001"
+                },
+                {
+                    "y": "002"
+                },
+                {
+                    "y": "003"
+                }
+            ]
+        }
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": "&$.x.**.y"
+        }
+
+        lexpected = [ "001", "002", "003" ]
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                lsource
+            )
+        
+        self.assertEqual(lexpected, lresult)
+
+    def test_20(self):
+        ljsonDecls = GetDeclarations()
+
+        lsource = None
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": ["&=", "thing", u"thing"]
+        }
+
+        lexpected = True
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                lsource
+            )
+        
+        self.assertEqual(lexpected, lresult)
+
+    def test_21(self):
+        ljsonDecls = GetDeclarations()
+
+        lsource = None
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": "^@.wontbefound"
+        }
+
+        lexpected = None
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                lsource
+            )
+        
+        self.assertEqual(lexpected, lresult)
+    
+    def test_22(self):
+        ljsonDecls = GetDeclarations()
+
+        lsource = [
+          {
+            "id": "001",
+            "parent": None
+          },
+          {
+            "id": "002",
+            "parent": None
+          },
+          {
+            "id": "003",
+            "parent": {
+              "id": "002"
+            }
+          }
+        ]
+
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": [
+            "^%",
+            {
+              "!": "^*.mapget_core",
+              "key": "^$.2.parent.id",
+              "map": {
+                  "!": "^*.idlisttomap",
+                  "list": "^$",
+                  "keypath": ["id"]
+              }
+            },
+            "id"
+          ],
+          "requires": ["mapget_core", "idlisttomap"]
+        }
+
+        lexpected = "002"
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                lsource
             )
         
         self.assertEqual(lexpected, lresult)

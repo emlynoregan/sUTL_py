@@ -26,7 +26,7 @@ def _doPath(a, b):
                             if isObject(lstackItem):
                                 retval.extend(lstackItem.values())
                                 lstack.extend(lstackItem.values())
-                            elif isArray(litem):
+                            elif isArray(lstackItem):
                                 retval.extend(lstackItem)
                                 lstack.extend(lstackItem)
                     elif b == "*":
@@ -111,7 +111,7 @@ def builtins():
     def keysF(parentscope, scope, l, src, tt, b):
         obj = scope.get("map")
         if isObject(obj):
-            return obj.keys()
+            return [unicode(lkey) for lkey in obj.keys()]
         else:
             return None
 
@@ -262,7 +262,7 @@ def builtins():
     }
     
     retval.update(
-        {"has%s" % key: lambda(parentscope, scope, l, src, tt, b): True for key in retval.keys()}
+        {u"has%s" % key: lambda(parentscope, scope, l, src, tt, b): True for key in retval.keys()}
     )
     
     return retval
@@ -295,7 +295,10 @@ def _evaluate(s, t, l, src, tt, b):
     elif isPathHeadTransform(t):
         retval = _evaluatePathHead(s, t[1:], l, src, tt, b)
     else:
-        retval = t # simple transform
+        if isinstance(t, str):
+            retval = unicode(t)
+        else:
+            retval = t # simple transform
     return retval
 
 def _quoteEvaluate(s, t, l, src, tt, b):
@@ -337,7 +340,8 @@ def _evaluateArrayBuiltin(s, t, l, src, tt, b):
     
     uset = {
       "&": _getArrayBuiltinName(op),
-      "args": t[1:], #_evaluateList(s, t[1:], l, src, tt, b),
+#      "args": t[1:], 
+      "args": _evaluateList(s, t[1:], l, src, tt, b),
       "head": opChar == "^"
     }
     
@@ -404,7 +408,7 @@ def _evaluateEval(s, t, l, src, tt, b):
 
 def _evaluateDict(s, t, l, src, tt, b):
     retval = {
-        key: _evaluate(s, t[key], l, src, tt, b) 
+        unicode(key): _evaluate(s, t[key], l, src, tt, b) 
             for key in t.keys()
             if (key != "!") and (key != "&")
     } 
@@ -412,7 +416,7 @@ def _evaluateDict(s, t, l, src, tt, b):
 
 def _quoteEvaluateDict(s, t, l, src, tt, b):
     retval = {
-        key: _quoteEvaluate(s, t[key], l, src, tt, b) 
+        unicode(key): _quoteEvaluate(s, t[key], l, src, tt, b) 
             for key in t.keys()
     } 
     return retval
