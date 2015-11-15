@@ -43,7 +43,7 @@ class Tests(unittest.TestCase):
         return retval
     
     def test_Fail(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
         
         lfailDecl = {
             "name": "failtest",
@@ -93,7 +93,7 @@ class Tests(unittest.TestCase):
         }
 
     def test_1(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
    
         ldecl = {
             "requires": [
@@ -156,7 +156,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_2(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
             "transform-t": "^$.indexnames.1", 
@@ -174,7 +174,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_3(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
    
         ldecl = {
             "requires": [
@@ -213,7 +213,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_4(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
  
         ldecl = {
             "requires": [
@@ -240,7 +240,7 @@ class Tests(unittest.TestCase):
             raise Exception("Failed: %s" % lresult)
 
     def test_5(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
  
         ldecl = {
             "requires": [
@@ -264,7 +264,7 @@ class Tests(unittest.TestCase):
             raise Exception("Failed: %s" % lresult)
 
     def test_6(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
  
         ldecl = {
             "transform-t": {
@@ -293,7 +293,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_7(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
         
         lfilterDecl =   {
             "name": "testfilter",
@@ -350,7 +350,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_8(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
           "language": "sUTL0",
@@ -373,7 +373,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
         
     def test_9(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         lreduceDecl =   {
             "name": "testreduce",
@@ -438,7 +438,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
         
     def test_10(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         lreduceDecl =   {
             "name": "testcond",
@@ -481,7 +481,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_11(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
             "transform-t": {"&": "keys", "map": "^$"}, 
@@ -513,7 +513,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_12(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
           "transform-t": {"'": {
@@ -537,7 +537,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_13(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
   
         ldecl = {
             "requires": [
@@ -561,7 +561,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_14(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
             "requires": [
@@ -588,7 +588,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_15(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
             "transform-t": "^$", 
@@ -604,7 +604,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(self.deepEqual(lresult, self._source), "lresult: %s" % json.dumps(lresult))
 
     def test_16(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
             "transform-t": {
@@ -623,7 +623,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(2, lresult)
 
     def test_17(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
           "language": "sUTL0",
@@ -657,7 +657,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(lexpected, lresult)
         
     def test_18(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         ldecl = {
           "language": "sUTL0",
@@ -693,7 +693,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(lexpected, lresult)
 
     def test_19(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         lsource = {
             "x": [
@@ -724,7 +724,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(lexpected, lresult)
 
     def test_20(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         lsource = None
         ldecl = {
@@ -743,7 +743,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(lexpected, lresult)
 
     def test_21(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         lsource = None
         ldecl = {
@@ -762,7 +762,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(lexpected, lresult)
     
     def test_22(self):
-        ljsonDecls = GetDeclarations()
+        ljsonDecls = _declarations
 
         lsource = [
           {
@@ -809,6 +809,53 @@ class Tests(unittest.TestCase):
         
         self.assertEqual(lexpected, lresult)
 
+    def test_23(self):
+        ljsonDecls = _declarations
+
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t":
+          [
+            "^%",
+            {
+              "x": 1,
+              "y": 2
+            },
+            "y"
+          ]
+          ,
+          "requires": ["calcpath", "stepneedscomplete", "calcstepevents"]
+        }
+
+        lexpected = 2
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                None
+            )
+        
+        self.assertEqual(lexpected, lresult)
+        
+    def test_24(self):
+        ljsonDecls = _declarations
+
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": ["&+", None, 3]
+        }
+
+        lexpected = 3
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                ljsonDecls,
+                None
+            )
+        
+        self.assertEqual(lexpected, lresult)
+
+        
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)
     
@@ -833,12 +880,19 @@ def GetCoreTests():
      
     return json.loads(ljsonCoreTestsString)
     
-        
+_declarations = None
+_coreTests = None
+
 def AddTests(aGetDeclarationsF = GetDeclarations, aGetCoreTestsF = GetCoreTests):
-    ljsonDecls = aGetDeclarationsF()
-     
-    ljsonCoreTests = aGetCoreTestsF()
-         
+    global _declarations
+    global _coreTests
+    
+    _declarations = aGetDeclarationsF()
+    _coreTests = aGetCoreTestsF()
+    
+    ljsonDecls = _declarations
+    ljsonCoreTests = _coreTests
+
     for lindex, lsUTLdeclaration in enumerate(ljsonCoreTests):
         ltestName = lsUTLdeclaration.get("name", str(lindex))
          

@@ -229,21 +229,33 @@ def builtins():
             return retval
         return OpF
         
+    def Get(aDict, aKey, aDefault):
+        retval = aDict.get(aKey)
+        if retval is None:
+            retval = aDefault
+        return retval
+    
     retval = {
         "path": pathF,
-        "+": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i + j),
-        "-": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i - j),
-        "*": getBinOpF(lambda scope: scope.get("a", 1), lambda scope: scope.get("b", 1), lambda i, j: i * j),
-        "/": getBinOpF(lambda scope: scope.get("a", 1), lambda scope: scope.get("b", 1), lambda i, j: i / j),
-        "=": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: type(i) == type(j) and i == j),
-        "!=": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: type(i) != type(j) or i != j),
-        ">=": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i >= j),
-        "<=": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i <= j),
-        ">": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i > j),
-        "<": getBinOpF(lambda scope: scope.get("a", 0), lambda scope: scope.get("b", 0), lambda i, j: i < j),
+        "+": getBinOpF(
+            lambda scope: 
+                Get(scope, "a", 0), 
+            lambda scope: 
+                Get(scope, "b", 0), 
+            lambda i, j: i + j
+        ),
+        "-": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i - j),
+        "*": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i * j),
+        "/": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i / j),
+        "=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: type(i) == type(j) and i == j),
+        "!=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: type(i) != type(j) or i != j),
+        ">=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i >= j),
+        "<=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i <= j),
+        ">": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i > j),
+        "<": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i < j),
         "&&": andF,
-        "||": getBinOpF(lambda scope: scope.get("a", False), lambda scope: scope.get("b", False), lambda i, j: i or j),
-        "!": getUnOpF(lambda scope: scope.get("b", False), lambda i: not i),
+        "||": getBinOpF(lambda scope: Get(scope, "a", False), lambda scope: Get(scope, "b", False), lambda i, j: i or j),
+        "!": getUnOpF(lambda scope: Get(scope, "b", False), lambda i: not i),
         "if": ifF,
         "len": lenF,
         "keys": keysF,
