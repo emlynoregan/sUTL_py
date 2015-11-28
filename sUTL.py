@@ -101,6 +101,13 @@ def builtins():
 
         return retval
     
+    def zipF(parentscope, scope, l, src, tt, b):
+        llist = scope.get("list")
+
+        retval = [list(item) for item in zip(*llist)]
+
+        return retval
+    
     def lenF(parentscope, scope, l, src, tt, b):
         obj = scope.get("list")
         if isArray(obj):
@@ -235,6 +242,16 @@ def builtins():
             retval = aDefault
         return retval
     
+    def DoEq(i, j):
+#         print ("In Equals")
+#         print (type(i))
+#         print (i)
+#         print (type(j))
+#         print (j)
+        retval = type(i) == type(j) and i == j
+#         print retval
+        return retval
+    
     retval = {
         "path": pathF,
         "+": getBinOpF(
@@ -247,8 +264,8 @@ def builtins():
         "-": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i - j),
         "*": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i * j),
         "/": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i / j),
-        "=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: type(i) == type(j) and i == j),
-        "!=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: type(i) != type(j) or i != j),
+        "=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: DoEq(i,j)),
+        "!=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: not (DoEq(i,j))),
         ">=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i >= j),
         "<=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i <= j),
         ">": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i > j),
@@ -257,6 +274,7 @@ def builtins():
         "||": getBinOpF(lambda scope: Get(scope, "a", False), lambda scope: Get(scope, "b", False), lambda i, j: i or j),
         "!": getUnOpF(lambda scope: Get(scope, "b", False), lambda i: not i),
         "if": ifF,
+        "zip": zipF,
         "len": lenF,
         "keys": keysF,
         "values": valuesF,
@@ -274,7 +292,7 @@ def builtins():
     }
     
     retval.update(
-        {u"has%s" % key: lambda(parentscope, scope, l, src, tt, b): True for key in retval.keys()}
+        {u"has%s" % key: lambda parentscope, scope, l, src, tt, b: True for key in retval.keys()}
     )
     
     return retval
