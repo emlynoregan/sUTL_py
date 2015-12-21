@@ -264,12 +264,12 @@ def builtins():
         "-": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i - j),
         "*": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i * j),
         "/": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i / j),
-        "=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: DoEq(i,j)),
-        "!=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: not (DoEq(i,j))),
-        ">=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i >= j),
-        "<=": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i <= j),
-        ">": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i > j),
-        "<": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i < j),
+        "=": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: DoEq(i,j)),
+        "!=": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: not (DoEq(i,j))),
+        ">=": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: i >= j),
+        "<=": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: i <= j),
+        ">": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: i > j),
+        "<": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: i < j),
         "&&": andF,
         "||": getBinOpF(lambda scope: Get(scope, "a", False), lambda scope: Get(scope, "b", False), lambda i, j: i or j),
         "!": getUnOpF(lambda scope: Get(scope, "b", False), lambda i: not i),
@@ -370,8 +370,8 @@ def _evaluateArrayBuiltin(s, t, l, src, tt, b):
     
     uset = {
       "&": _getArrayBuiltinName(op),
-#      "args": t[1:], 
-      "args": _evaluateList(s, t[1:], l, src, tt, b),
+      "args": t[1:], 
+#      "args": _evaluateList(s, t[1:], l, src, tt, b),
       "head": opChar == "^"
     }
     
@@ -416,14 +416,25 @@ def _evaluateBuiltin(s, t, l, src, tt, b):
                 retval = None
     else:
         builtinf = b.get(t.get("&"))
-    
         if builtinf:
-            s2 = _evaluateDict(s, t, l, src, tt, b)
+            llibname = "_override_%s" + t.get("&")
+        else:
+            llibname = t.get("&")
+            
+        if llibname in l:
+            t2 = dict(t)
+            t2["!"] = ["^*", t["&"]]
+            del t2["&"]
+
+            retval = _evaluateEval(s, t2, l, src, tt, b)
+        elif builtinf:
+            s2 = dict(s) if isObject(s) else {}
+            s2.update(_evaluateDict(s, t, l, src, tt, b))
     
             l2 = _evaluateDict(s, t["*"], l, src, tt, b) if "*" in t else l
     
             retval = builtinf(s, s2, l2, src, tt, b)
-
+                
     return retval
 
 def _evaluateEval(s, t, l, src, tt, b):
