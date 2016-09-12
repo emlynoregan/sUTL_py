@@ -11,7 +11,7 @@ Evaluate a transform like this:
 
     transform = {
         "&": "+",
-        "a": "#$",
+        "a": "^@",
         "b": 5
     }
   
@@ -31,18 +31,18 @@ To use library distributions, do the following:
 2: Add your transform to a declaration
 
     transform = {
-        "!": "#*.map",
-        "list": "#$",
-        "t": {"'": {
+        "&": "map_core",
+        "list": "^@",
+        "t": {":": {
             "&": "+",
-            "a": "#@.item",
+            "a": "^@.item",
             "b": 1
         }}
     }
 
     declaration = {
       "transform-t": transform,
-      "requires": ["map"]
+      "requires": ["map_core"]
     }
 
 3: Compile a set of libraries from the distribution
