@@ -1,4 +1,4 @@
-from jsonpath import jsonpath
+from copy import deepcopy
 
 def _processPath(startfrom, parentscope, scope, l, src, tt, b):
     la = scope.get("a")
@@ -50,40 +50,40 @@ def _doPath(a, b):
 
 def builtins():
     
-    def pathF(parentscope, scope, l, src, tt, b):
-        '''
-        DEPRECATED
-        '''
-        fullpath = scope.get("path", "")
-
-        prefix = fullpath[:1]
-        path = fullpath[1:]
-        childscope = None
-
-        if prefix == '@':
-            childscope = parentscope
-        elif prefix == '^':
-            childscope = scope # is this even a thing?
-        elif prefix == '*':
-            childscope = l
-        elif prefix == '$':
-            childscope = src
-        elif prefix == '~':
-            childscope = tt
-
-        if childscope:
-            if path and not path[0] == ".":
-                path = "$.%s" % path
-            else:
-                path = "$%s" % path
-
-            if path == "$":
-                retval = [childscope]
-            else:
-                retval = jsonpath(childscope, path, use_eval=False)
-            return retval
-        else:
-            return []
+#     def pathF(parentscope, scope, l, src, tt, b):
+#         '''
+#         DEPRECATED
+#         '''
+#         fullpath = scope.get("path", "")
+# 
+#         prefix = fullpath[:1]
+#         path = fullpath[1:]
+#         childscope = None
+# 
+#         if prefix == '@':
+#             childscope = parentscope
+#         elif prefix == '^':
+#             childscope = scope # is this even a thing?
+#         elif prefix == '*':
+#             childscope = l
+#         elif prefix == '$':
+#             childscope = src
+#         elif prefix == '~':
+#             childscope = tt
+# 
+#         if childscope:
+#             if path and not path[0] == ".":
+#                 path = "$.%s" % path
+#             else:
+#                 path = "$%s" % path
+# 
+#             if path == "$":
+#                 retval = [childscope]
+#             else:
+#                 retval = jsonpath(childscope, path, use_eval=False)
+#             return retval
+#         else:
+#             return []
     
     def ifF(parentscope, scope, l, src, tt, b):
         retval = None
@@ -104,8 +104,29 @@ def builtins():
     def zipF(parentscope, scope, l, src, tt, b):
         llist = scope.get("list")
 
-        retval = [list(item) for item in zip(*llist)]
+        retval = deepcopy([list(item) for item in zip(*llist)])
 
+        return retval
+
+    def removeKeysF(parentscope, scope, l, src, tt, b):
+        lmap = scope.get("map")
+        lkeys = scope.get("keys")
+        lkeys = lkeys if lkeys else []
+        
+        retval = None
+        if lmap != None:
+            retval = deepcopy(lmap)
+            for lkey in lkeys:
+                if lkey in retval:
+                    del retval[lkey]
+
+        return retval
+    
+    def sortF(parentscope, scope, l, src, tt, b):
+        llist = scope.get("list")
+
+        retval = sorted(llist) if llist else llist
+ 
         return retval
     
     def lenF(parentscope, scope, l, src, tt, b):
@@ -253,7 +274,7 @@ def builtins():
         return retval
     
     retval = {
-        "path": pathF,
+#         "path": pathF,
         "+": getBinOpF(
             lambda scope: 
                 Get(scope, "a", 0), 
@@ -275,12 +296,14 @@ def builtins():
         "!": getUnOpF(lambda scope: Get(scope, "b", False), lambda i: not i),
         "if": ifF,
         "zip": zipF,
+        "removekeys": removeKeysF,
         "len": lenF,
         "keys": keysF,
         "values": valuesF,
         "type": typeF,
         "makemap": makemapF,
         "reduce": reduceF,
+        "quicksort": sortF,
         "head": headF,
         "tail": tailF,
         "$": lambda parentscope, scope, l, src, tt, b: _processPath(src, parentscope, scope, l, src, tt, b),
@@ -320,10 +343,10 @@ def _evaluate(s, t, l, src, tt, b):
             retval = _evaluateList(s, t, l, src, tt, b)
     elif isStringBuiltinEval(t, b):
         retval = _evaluateStringBuiltin(s, t, l, src, tt, b)
-    elif isPathTransform(t):
-        retval = _evaluatePath(s, t[2:], l, src, tt, b)
-    elif isPathHeadTransform(t):
-        retval = _evaluatePathHead(s, t[1:], l, src, tt, b)
+#     elif isPathTransform(t):
+#         retval = _evaluatePath(s, t[2:], l, src, tt, b)
+#     elif isPathHeadTransform(t):
+#         retval = _evaluatePathHead(s, t[1:], l, src, tt, b)
     else:
         if isinstance(t, str):
             retval = unicode(t)
@@ -468,18 +491,18 @@ def _evaluateList(s, t, l, src, tt, b):
 def _quoteEvaluateList(s, t, l, src, tt, b):
     return [_quoteEvaluate(s, item, l, src, tt, b) for item in t]
 
-def _evaluatePathHead(s, t, l, src, tt, b):
-    resultlist = _evaluatePath(s, t, l, src, tt, b)
+# def _evaluatePathHead(s, t, l, src, tt, b):
+#     resultlist = _evaluatePath(s, t, l, src, tt, b)
+# 
+#     return resultlist[0] if resultlist else None
 
-    return resultlist[0] if resultlist else None
-
-def _evaluatePath(s, t, l, src, tt, b):
-    path_t = {
-        "&": "path",
-        "path": t
-    }
-
-    return _evaluate(s, path_t, l, src, tt, b)
+# def _evaluatePath(s, t, l, src, tt, b):
+#     path_t = {
+#         "&": "path",
+#         "path": t
+#     }
+# 
+#     return _evaluate(s, path_t, l, src, tt, b)
 
 def _flatten(lst):
     lst2 = [item if isArray(item) else [item] for item in lst]
@@ -535,16 +558,16 @@ def isString(obj):
     return isinstance(obj, basestring)
 
 def isNumber(obj):
-    return isinstance(obj, (int, float))
+    return isinstance(obj, (int, float, long))
 
 def isBool(obj):
     return isinstance(obj, bool)
 
-def isPathHeadTransform(obj):
-    return isString(obj) and obj[:1] == "#"
-
-def isPathTransform(obj):
-    return isString(obj) and obj[:2] == "##"
+# def isPathHeadTransform(obj):
+#     return isString(obj) and obj[:1] == "#"
+# 
+# def isPathTransform(obj):
+#     return isString(obj) and obj[:2] == "##"
 
 def compilelib(decls, dists, test):
     return _compilelib(decls, dists, {}, test, builtins())

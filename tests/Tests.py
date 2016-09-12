@@ -1,9 +1,12 @@
 import unittest
-import sUTL
+from sUTL import sUTL
 import json
 import urllib2
 
 class Tests(unittest.TestCase):
+    def setUp(self):
+        AddTests()
+        
     def deepEqual(self, aMAS1, aMAS2, maxdepth=100):
         retval = False
 
@@ -869,13 +872,21 @@ def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     
     return lresult
 
-def GetDeclarations():
+def GetLocalDeclarations():
+    with open("./spec/sUTL_core.json") as f:
+        return [json.load(f)]
+
+def GetRemoteDeclarations():
     ljsonDecls = []
     ljsonCoreString = urllib2.urlopen("http://emlynoregan.github.io/sUTL-spec/sUTL_core.json").read()
     ljsonDecls.append(json.loads(ljsonCoreString))
     return ljsonDecls
 
-def GetCoreTests():
+def GetLocalCoreTests():
+    with open("./spec/sUTL_coretests.json") as f:
+        return json.load(f)
+
+def GetRemoteCoreTests():
     ljsonCoreTestsString = urllib2.urlopen("http://emlynoregan.github.io/sUTL-spec/sUTL_coretests.json").read()
      
     return json.loads(ljsonCoreTestsString)
@@ -883,7 +894,7 @@ def GetCoreTests():
 _declarations = None
 _coreTests = None
 
-def AddTests(aGetDeclarationsF = GetDeclarations, aGetCoreTestsF = GetCoreTests):
+def AddTests(aGetDeclarationsF = GetLocalDeclarations, aGetCoreTestsF = GetLocalCoreTests):
     global _declarations
     global _coreTests
     
