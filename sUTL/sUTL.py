@@ -283,7 +283,7 @@ def builtins():
             lambda i, j: i + j
         ),
         "-": getBinOpF(lambda scope: Get(scope, "a", 0), lambda scope: Get(scope, "b", 0), lambda i, j: i - j),
-        "*": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i * j),
+        "x": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i * j),
         "/": getBinOpF(lambda scope: Get(scope, "a", 1), lambda scope: Get(scope, "b", 1), lambda i, j: i / j),
         "=": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: DoEq(i,j)),
         "!=": getBinOpF(lambda scope: Get(scope, "a", None), lambda scope: Get(scope, "b", None), lambda i, j: not (DoEq(i,j))),
