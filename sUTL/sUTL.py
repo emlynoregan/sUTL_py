@@ -1,4 +1,5 @@
 from copy import deepcopy
+from string import split, strip
 
 def _processPath(startfrom, parentscope, scope, l, src, tt, b):
     la = scope.get("a")
@@ -233,6 +234,49 @@ def builtins():
                 return b[1:]
             else:
                 return []
+
+    def splitF(parentscope, scope, l, src, tt, b):
+        lvalue = scope.get("value")
+        lsep = scope.get("sep") 
+        lmax = scope.get("max")
+
+        if not lvalue:
+            retval = None
+        elif lmax and not isNumber(lmax):
+            retval = None
+        else:
+            if not lsep:
+                lsep = ","
+            if lmax:
+                retval = unicode(lvalue).split(unicode(lsep), lmax)
+            else:
+                retval = unicode(lvalue).split(unicode(lsep))
+
+        return retval
+
+    def trimF(parentscope, scope, l, src, tt, b):
+        lvalue = scope.get("value")
+        
+        if not lvalue:
+            retval = None
+        else:
+            retval = unicode(lvalue).strip()
+
+        return retval
+
+    def posF(parentscope, scope, l, src, tt, b):
+        lvalue = scope.get("value")
+        lsub = scope.get("sub")
+        
+        if not lvalue:
+            retval = None
+        elif not lsub:
+            retval = None
+        else:
+            retval = unicode(lvalue).find(unicode(lsub))
+        
+        return retval
+        
             
     def getBinOpF(iF, jF, aDoOpF):
         def OpF(parentscope, scope, l, src, tt, b):
@@ -306,6 +350,9 @@ def builtins():
         "quicksort": sortF,
         "head": headF,
         "tail": tailF,
+        "split": splitF,
+        "trim": trimF,
+        "pos": posF,
         "$": lambda parentscope, scope, l, src, tt, b: _processPath(src, parentscope, scope, l, src, tt, b),
         "@": lambda parentscope, scope, l, src, tt, b: _processPath(parentscope, parentscope, scope, l, src, tt, b),
         "^": lambda parentscope, scope, l, src, tt, b: _processPath(scope, parentscope, scope, l, src, tt, b),

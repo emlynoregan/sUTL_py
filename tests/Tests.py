@@ -858,6 +858,75 @@ class Tests(unittest.TestCase):
         
         self.assertEqual(lexpected, lresult)
 
+    def test_25(self):
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": {
+            "&": "split",
+            "value": "mailto:thingo@example.com",
+            "sep": ":"
+          }
+        }
+        
+        lexpected = ["mailto", "thingo@example.com"]
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                [],
+                None
+            )
+        
+        self.assertEqual(lexpected, lresult)
+        
+    def test_26(self):
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": {
+            "&": "trim",
+            "value": "    blabo    "
+          }
+        }
+        
+        lexpected = "blabo"
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                [],
+                None
+            )
+        
+        self.assertEqual(lexpected, lresult)
+
+    def test_27(self):
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": 
+          {
+           "a": {
+            "&": "pos",
+            "value": "HelloWorld!!",
+            "sub": "or"
+           },
+           "b": {
+            "&": "pos",
+            "value": "HelloWorld!!",
+            "sub": "x"
+           }
+          }
+        }
+        
+        lexpected = {
+            "a": 6,
+            "b": -1
+        }
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                [],
+                None
+            )
+        
+        self.assertEqual(lexpected, lresult)
         
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)
