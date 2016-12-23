@@ -45,31 +45,31 @@ class Tests(unittest.TestCase):
             
         return retval
     
-    def test_Fail(self):
-        ljsonDecls = _declarations
-        
-        lfailDecl = {
-            "name": "failtest",
-            "language": "sUTL0",
-            "transform-t":   
-            {
-              "!": "^*.tests_tst",
-              "tests": {"'": [
-                {
-                  "name": "this one fails",
-                  "test-t": False
-                }
-              ]}
-            },
-            "requires": [
-              "tests_tst"
-            ]
-          }
-        
-        lresult = EvaluateTransform(lfailDecl, ljsonDecls)
-        
-        if not lresult:
-            raise Exception("Failed to fail")
+#     def test_Fail(self):
+#         ljsonDecls = _declarations
+#         
+#         lfailDecl = {
+#             "name": "failtest",
+#             "language": "sUTL0",
+#             "transform-t":   
+#             {
+#               "!": "^*.tests_tst",
+#               "tests": {"'": [
+#                 {
+#                   "name": "this one fails",
+#                   "test-t": False
+#                 }
+#               ]}
+#             },
+#             "requires": [
+#               "tests_tst"
+#             ]
+#           }
+#         
+#         lresult = EvaluateTransform(lfailDecl, ljsonDecls)
+#         
+#         if not lresult:
+#             raise Exception("Failed to fail")
 
     _source = {
             "updated": 1438517599342400, 
@@ -156,7 +156,7 @@ class Tests(unittest.TestCase):
                 self._source
             )
           
-        self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
+        self.assertTrue(self.deepEqual(self.deepUnicode(lresult), lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_2(self):
         ljsonDecls = _declarations
@@ -213,7 +213,7 @@ class Tests(unittest.TestCase):
                 self._source
             )
           
-        self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
+        self.assertTrue(self.deepEqual(self.deepUnicode(lresult), lexpected), "lresult: %s" % json.dumps(lresult))
 
     def test_4(self):
         ljsonDecls = _declarations
@@ -277,8 +277,8 @@ class Tests(unittest.TestCase):
                 "t": {"'": 
                   {
                     "&": "+",
-                    "a": "^@.item",
-                    "b": "^@.accum"
+                    "b": "^@.item",
+                    "a": "^@.accum"
                   }
                 }
             }, 
@@ -291,7 +291,20 @@ class Tests(unittest.TestCase):
                 self._source
             )
         
-        lexpected = u"objecttypeindexnamestypedocumentinvaliddocaltclientkeykeyeventkeyidstoredapkeyupdated"
+        lexpected = "".join(sorted([
+          u"updated",
+          u"apkey",
+          u"stored",
+          u"eventkeyid",
+          u"key",
+          u"clientkey",
+          u"docalt",
+          u"invalid",
+          u"document",
+          u"type",
+          u"indexnames",
+          u"objecttype"
+        ]))
         
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
 
@@ -388,15 +401,15 @@ class Tests(unittest.TestCase):
               "true": { "'": {
                 "!": "^*.testreduce",
                 "list": {
-                  "!": "^*.tail_core_emlynoregan_com",
-                  "list": "^@.list"
+                  "&": "tail",
+                  "b": "^@.list"
                 },
                 "t": "^@.t",
                 "accum": {
                   "!": "^@.t",
                   "item": {
-                    "!": "^*.head_core_emlynoregan_com",
-                    "list": "^@.list"
+                    "&": "head",
+                    "b": "^@.list"
                   },
                   "accum": "^@.accum"
                 }
@@ -423,7 +436,7 @@ class Tests(unittest.TestCase):
                 "!": "^*.testreduce", 
                 "list": {"&": "keys", "map": "^$"}, 
                 "accum": "",
-                "t": {"'": [ "&+", "^@.item", "^@.accum"]}
+                "t": {"'": [ "&+", "^@.accum", "^@.item"]}
             }, 
             "language": "sUTL0"
         }
@@ -436,9 +449,21 @@ class Tests(unittest.TestCase):
                 self._source
             )
         
-        lexpected = u"objecttypeindexnamestypedocumentinvaliddocaltclientkeykeyeventkeyidstoredapkeyupdated"
-        
-        self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))
+        lexpected = "".join(sorted([
+          u"updated",
+          u"apkey",
+          u"stored",
+          u"eventkeyid",
+          u"key",
+          u"clientkey",
+          u"docalt",
+          u"invalid",
+          u"document",
+          u"type",
+          u"indexnames",
+          u"objecttype"
+        ]))
+        self.assertTrue(self.deepEqual(self.deepUnicode(lresult), lexpected), "lresult: %s" % json.dumps(lresult))
         
     def test_10(self):
         ljsonDecls = _declarations
@@ -497,7 +522,7 @@ class Tests(unittest.TestCase):
                 self._source
             )
         
-        lexpected = [
+        lexpected = sorted([
           u"updated",
           u"apkey",
           u"stored",
@@ -510,7 +535,7 @@ class Tests(unittest.TestCase):
           u"type",
           u"indexnames",
           u"objecttype"
-        ]
+        ])
 
         
         self.assertTrue(self.deepEqual(lresult, lexpected), "lresult: %s" % json.dumps(lresult))

@@ -140,14 +140,15 @@ def builtins():
     def keysF(parentscope, scope, l, src, tt, b):
         obj = scope.get("map")
         if isObject(obj):
-            return [unicode(lkey) for lkey in obj.keys()]
+            return sorted([unicode(lkey) for lkey in obj.keys()])
         else:
             return None
 
     def valuesF(parentscope, scope, l, src, tt, b):
         obj = scope.get("map")
         if isObject(obj):
-            return obj.values()
+            keys = sorted([unicode(lkey) for lkey in obj.keys()])
+            return [obj[key] for key in keys]
         else:
             return None
 
