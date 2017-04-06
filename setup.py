@@ -23,13 +23,13 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.0.5b4',
+    version='1.0.5b6',
 
     description='A sUTL implementation for python',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/emlynoregan/sUTL_py',
+    url='http://www.sutllang.com/',
 
     # Author details
     author='Emlyn O\'Regan',
