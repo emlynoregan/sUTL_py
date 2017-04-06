@@ -952,6 +952,85 @@ class Tests(unittest.TestCase):
             )
         
         self.assertEqual(lexpected, lresult)
+
+    def test_28(self):
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": 
+          [
+              {
+                  "&": "string",
+                  "value": "test"
+              },
+              {
+                  "&": "string",
+                  "value": 45
+              },
+              {
+                  "&": "string",
+                  "value": 45.7
+              },
+              {
+                  "&": "string",
+                  "value": True
+              },
+              {
+                  "&": "string",
+                  "value": None
+              },
+              {
+                  "&": "number",
+                  "value": "test"
+              },
+              {
+                  "&": "number",
+                  "value": "14"
+              },
+              {
+                  "&": "number",
+                  "value": "47.9"
+              },
+              {
+                  "&": "number",
+                  "value": True
+              },
+              {
+                  "&": "number",
+                  "value": None
+              },
+              {
+                  "&": "boolean",
+                  "value": "x"
+              },
+              {
+                  "&": "boolean",
+                  "value": None
+              }
+          ]
+        }
+        
+        lexpected = [
+            "test",
+            "45",
+            "45.7",
+            "true",
+            "null",
+            0,
+            14,
+            47.9,
+            1,
+            0,
+            True,
+            False
+        ]
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                [],
+                None
+            )
+        
+        self.assertEqual(lexpected, lresult)
         
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)

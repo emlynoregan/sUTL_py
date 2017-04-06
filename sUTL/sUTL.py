@@ -1,5 +1,5 @@
 from copy import deepcopy
-from string import split, strip
+# from string import split, strip
 
 def _processPath(startfrom, parentscope, scope, l, src, tt, b):
     la = scope.get("a")
@@ -278,6 +278,51 @@ def builtins():
         
         return retval
         
+    def stringF(parentscope, scope, l, src, tt, b):
+        lvalue = scope.get("value")
+        
+        if isString(lvalue):
+            retval = lvalue
+        elif isNumber(lvalue):
+            retval = "%s" % lvalue
+        elif isBool(lvalue):
+            retval = "true" if lvalue else "false"
+        elif lvalue is None:
+            retval = "null"
+        elif isObject(lvalue):
+            retval = "map"
+        elif isArray(lvalue):
+            retval = "list"
+        else:
+            retval = "unknown"
+        
+        return retval
+            
+    def numberF(parentscope, scope, l, src, tt, b):
+        lvalue = scope.get("value")
+        retval = 0
+        
+        if isNumber(lvalue):
+            retval = lvalue
+        elif isString(lvalue):
+            try:
+                retval = int(lvalue)
+            except:
+                try:
+                    retval = float(lvalue)
+                except:
+                    pass
+        elif isBool(lvalue):
+            retval = 1 if lvalue else 0
+        elif lvalue is None:
+            retval = 0
+        
+        return retval
+            
+    def booleanF(parentscope, scope, l, src, tt, b):
+        lvalue = scope.get("value")
+        retval = bool(lvalue)
+        return retval
             
     def getBinOpF(iF, jF, aDoOpF):
         def OpF(parentscope, scope, l, src, tt, b):
@@ -354,6 +399,9 @@ def builtins():
         "split": splitF,
         "trim": trimF,
         "pos": posF,
+        "string": stringF,
+        "number": numberF,
+        "boolean": booleanF,
         "$": lambda parentscope, scope, l, src, tt, b: _processPath(src, parentscope, scope, l, src, tt, b),
         "@": lambda parentscope, scope, l, src, tt, b: _processPath(parentscope, parentscope, scope, l, src, tt, b),
         "^": lambda parentscope, scope, l, src, tt, b: _processPath(scope, parentscope, scope, l, src, tt, b),
@@ -606,7 +654,7 @@ def isString(obj):
     return isinstance(obj, basestring)
 
 def isNumber(obj):
-    return isinstance(obj, (int, float, long))
+    return isinstance(obj, (int, float, long)) and not isinstance(obj, bool)
 
 def isBool(obj):
     return isinstance(obj, bool)
