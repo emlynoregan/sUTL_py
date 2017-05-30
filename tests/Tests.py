@@ -1031,6 +1031,45 @@ class Tests(unittest.TestCase):
             )
         
         self.assertEqual(lexpected, lresult)
+
+    def test_29(self):
+        ldecl = {
+          "language": "sUTL0",
+          "transform-t": 
+          [
+              {
+                  "&": "lower",
+                  "value": "tEST"
+              },
+              {
+                  "&": "lower",
+                  "value": 45
+              },
+              {
+                  "&": "upper",
+                  "value": "this stuff"
+              },
+              {
+                  "&": "upper",
+                  "value": None
+              }
+          ]
+        }
+        
+        lexpected = [
+            "test",
+            "45",
+            "THIS STUFF",
+            "NULL"
+        ]
+        
+        lresult = EvaluateTransform(
+                ldecl,
+                [],
+                None
+            )
+        
+        self.assertEqual(lexpected, lresult)
         
 def EvaluateTransform(aDecl, aLibDecls, aSource = None):
     llibresult = sUTL.compilelib([aDecl], aLibDecls, True)

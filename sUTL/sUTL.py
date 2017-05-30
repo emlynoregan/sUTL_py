@@ -323,6 +323,12 @@ def builtins():
         lvalue = scope.get("value")
         retval = bool(lvalue)
         return retval
+
+    def lowerF(parentscope, scope, l, src, tt, b):
+        return stringF(parentscope, scope, l, src, tt, b).lower()
+
+    def upperF(parentscope, scope, l, src, tt, b):
+        return stringF(parentscope, scope, l, src, tt, b).upper()
             
     def getBinOpF(iF, jF, aDoOpF):
         def OpF(parentscope, scope, l, src, tt, b):
@@ -402,6 +408,8 @@ def builtins():
         "string": stringF,
         "number": numberF,
         "boolean": booleanF,
+        "lower": lowerF,
+        "upper": upperF,
         "$": lambda parentscope, scope, l, src, tt, b: _processPath(src, parentscope, scope, l, src, tt, b),
         "@": lambda parentscope, scope, l, src, tt, b: _processPath(parentscope, parentscope, scope, l, src, tt, b),
         "^": lambda parentscope, scope, l, src, tt, b: _processPath(scope, parentscope, scope, l, src, tt, b),
