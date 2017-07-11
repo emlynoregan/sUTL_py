@@ -365,7 +365,7 @@ def builtins():
 #         print (i)
 #         print (type(j))
 #         print (j)
-        retval = type(i) == type(j) and i == j
+        retval = (type(i) == type(j) or (isNumber(i) and isNumber(j)) or (isString(i) and isString(j))) and i == j
 #         print retval
         return retval
     
