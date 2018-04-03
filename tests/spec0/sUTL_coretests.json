@@ -1,0 +1,128 @@
+[
+  {
+    "name": "equalitytests_coretests_emlynoregan_com",
+    "language": "sUTL0",
+    "transform-t":   
+    {
+      "!": "^*.tests_tst",
+      "tests": {"'": [
+        {
+          "name": "true",
+          "test-t": true
+        },
+        {
+          "name": "false",
+          "test-t": {
+            "&": "!",
+            "b": false
+          }
+        },
+        {
+          "name": "null",
+          "test-t": {
+            "&": "!",
+            "b": null
+          }
+        },
+        {
+          "name": "null eq null",
+          "test-t": {
+            "&": "=",
+            "a": null,
+            "b": null
+          }  
+        },
+        {
+          "name": "null ne num",
+          "test-t": {
+            "&": "!=",
+            "a": null,
+            "b": 5
+          }  
+        },
+        {
+          "name": "false ne null",
+          "test-t": {
+            "&": "!=",
+            "a": null,
+            "b": false
+          }  
+        },
+        {
+          "name": "false ne 0",
+          "test-t": {
+            "&": "!=",
+            "a": 0,
+            "b": false
+          }  
+        },
+        {
+          "name": "1 ne 0",
+          "test-t": {
+            "&": "!=",
+            "a": 1,
+            "b": 0
+          }  
+        },
+        {
+          "name": "\"1\" ne 1",
+          "test-t": {
+            "&": "!=",
+            "a": "1",
+            "b": 1
+          }  
+        },
+        {
+          "name": "\"1\" + 1",
+          "test-t": {
+            "&": "=",
+            "a": null, 
+            "b": {
+              "&": "+",
+              "a": "1",
+              "b": 1
+            }  
+          }
+        }
+      ]}
+    },
+    "requires": [
+      "tests_tst"
+    ]
+  },
+  {
+    "name": "corelib_coretests_emlynoregan_com",
+    "language": "sUTL0",
+    "transform-t":   
+    {
+      "!": "^*.tests_tst",
+      "tests": {"'": [
+        {
+          "name": "removekeys",
+          "test-t": 
+          {
+            "&": "=",
+            "a": {
+              "&": "type",
+              "value":
+              {
+                "!": {"'": "^@.x.x"},
+                "x": {
+                  "!": "^*.removekeys_core", 
+                  "map": {"x": "a string"}, 
+                  "keys": [
+                      "document"
+                  ]
+                }
+              }
+            },
+            "b": "string"
+          }
+        }
+      ]}
+    },
+    "requires": [
+      "tests_tst", "removekeys_core"
+    ]
+  }
+]
