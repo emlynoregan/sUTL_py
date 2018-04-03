@@ -1,6 +1,12 @@
 from copy import deepcopy
 # from string import split, strip
 
+def _unicode(x):
+    if isinstance(x, unicode):
+        return x
+    else:
+        return unicode(x, errors="ignore")
+    
 def _processPath(startfrom, parentscope, scope, l, src, tt, b):
     la = scope.get("a")
     lb = scope.get("b")
@@ -140,14 +146,14 @@ def builtins():
     def keysF(parentscope, scope, l, src, tt, b):
         obj = scope.get("map")
         if isObject(obj):
-            return sorted([unicode(lkey) for lkey in obj.keys()])
+            return sorted([_unicode(lkey) for lkey in obj.keys()])
         else:
             return None
 
     def valuesF(parentscope, scope, l, src, tt, b):
         obj = scope.get("map")
         if isObject(obj):
-            keys = sorted([unicode(lkey) for lkey in obj.keys()])
+            keys = sorted([_unicode(lkey) for lkey in obj.keys()])
             return [obj[key] for key in keys]
         else:
             return None
@@ -249,9 +255,9 @@ def builtins():
             if not lsep:
                 lsep = ","
             if lmax:
-                retval = unicode(lvalue).split(unicode(lsep), lmax)
+                retval = _unicode(lvalue).split(_unicode(lsep), lmax)
             else:
-                retval = unicode(lvalue).split(unicode(lsep))
+                retval = _unicode(lvalue).split(_unicode(lsep))
 
         return retval
 
@@ -261,7 +267,7 @@ def builtins():
         if not lvalue:
             retval = None
         else:
-            retval = unicode(lvalue).strip()
+            retval = _unicode(lvalue).strip()
 
         return retval
 
@@ -274,7 +280,7 @@ def builtins():
         elif not lsub:
             retval = None
         else:
-            retval = unicode(lvalue).find(unicode(lsub))
+            retval = _unicode(lvalue).find(_unicode(lsub))
         
         return retval
         
@@ -453,7 +459,7 @@ def _evaluate(s, t, l, src, tt, b):
 #         retval = _evaluatePathHead(s, t[1:], l, src, tt, b)
     else:
         if isinstance(t, str):
-            retval = unicode(t)
+            retval = _unicode(t)
         else:
             retval = t # simple transform
     return retval
@@ -576,7 +582,7 @@ def _evaluateEval(s, t, l, src, tt, b):
 
 def _evaluateDict(s, t, l, src, tt, b):
     retval = {
-        unicode(key): _evaluate(s, t[key], l, src, tt, b) 
+        _unicode(key): _evaluate(s, t[key], l, src, tt, b) 
             for key in t.keys()
             if (key != "!") and (key != "&")
     } 
@@ -584,7 +590,7 @@ def _evaluateDict(s, t, l, src, tt, b):
 
 def _quoteEvaluateDict(s, t, l, src, tt, b):
     retval = {
-        unicode(key): _quoteEvaluate(s, t[key], l, src, tt, b) 
+        _unicode(key): _quoteEvaluate(s, t[key], l, src, tt, b) 
             for key in t.keys()
     } 
     return retval
